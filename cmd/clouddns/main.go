@@ -48,12 +48,12 @@ func main() {
 		log.Fatal("domain or record subcommand is required")
 	}
 
-	if len(os.Args) < 3 {
-		log.Fatal("create, show, update, or delete action is required")
-	}
-
 	switch os.Args[1] {
 	case "domain":
+		if len(os.Args) < 3 {
+			log.Fatal("create, show, update, or delete action is required")
+		}
+
 		switch os.Args[2] {
 		case "create":
 			createDomCmd.Parse(os.Args[3:])
@@ -88,17 +88,20 @@ func main() {
 			os.Exit(1)
 		}
 	case "record":
-		switch os.Args[2] {
+		if len(os.Args) < 4 {
+			log.Fatal("domID and one of create, show, update, or delete action is required")
+		}
+		switch os.Args[3] {
 		case "create":
-			createRecCmd.Parse(os.Args[3:])
+			createRecCmd.Parse(os.Args[4:])
 		case "list":
-			listRecCmd.Parse(os.Args[3:])
+			listRecCmd.Parse(os.Args[4:])
 		case "show":
-			showRecCmd.Parse(os.Args[3:])
+			showRecCmd.Parse(os.Args[4:])
 		case "update":
-			updateRecCmd.Parse(os.Args[3:])
+			updateRecCmd.Parse(os.Args[4:])
 		case "delete":
-			deleteRecCmd.Parse(os.Args[3:])
+			deleteRecCmd.Parse(os.Args[4:])
 		default:
 			flag.PrintDefaults()
 			os.Exit(1)
