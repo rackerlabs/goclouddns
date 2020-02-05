@@ -13,6 +13,7 @@ import (
 
 	"github.rackspace.com/doug1840/goclouddns"
 	"github.rackspace.com/doug1840/goclouddns/domains"
+	"github.rackspace.com/doug1840/goclouddns/records"
 )
 
 func main() {
@@ -35,12 +36,21 @@ func main() {
 
 	// create subcommand of record
 	createRecCmd := flag.NewFlagSet("create", flag.ExitOnError)
+	createRecComment := createRecCmd.String("comment", "", "optional comments")
+	createRecTTL := createRecCmd.Uint("ttl", 0, "TTL for the record")
 	// list subcommand of record
 	listRecCmd := flag.NewFlagSet("list", flag.ExitOnError)
+	listRecFilterName := listRecCmd.String("name", "", "filter records matching this name")
+	listRecFilterData := listRecCmd.String("data", "", "filter records matching this data")
+	listRecFilterType := listRecCmd.String("type", "", "filter records matching this type")
 	// show subcommand of record
 	showRecCmd := flag.NewFlagSet("show", flag.ExitOnError)
 	// update subcommand of record
 	updateRecCmd := flag.NewFlagSet("update", flag.ExitOnError)
+	updateRecData := updateRecCmd.String("data", "", "optional change to data for the record")
+	updateRecPriority := updateRecCmd.Uint("priority", 0, "optional change to priority for the record")
+	updateRecTTL := updateRecCmd.Uint("ttl", 0, "optional change to TTL for the record")
+	updateRecComment := updateRecCmd.String("comment", "", "optional comments")
 	// delete subcommand of record
 	deleteRecCmd := flag.NewFlagSet("delete", flag.ExitOnError)
 
@@ -70,7 +80,7 @@ func main() {
 		}
 	case "record":
 		if len(os.Args) < 4 {
-			log.Fatal("domID and one of create, show, update, or delete action is required")
+			log.Fatal("domID and one of create, list, show, update, or delete action is required")
 		}
 
 		switch os.Args[3] {
@@ -85,8 +95,7 @@ func main() {
 		case "delete":
 			deleteRecCmd.Parse(os.Args[4:])
 		default:
-			flag.PrintDefaults()
-			os.Exit(1)
+			log.Fatalf("Usage: %s record DOMID create|list|show|update|delete ...", os.Args[0])
 		}
 	}
 
@@ -217,13 +226,133 @@ func main() {
 		}
 		log.Print("Successfully deleted")
 	} else if createRecCmd.Parsed() {
-		fmt.Println("record create")
+		args := createRecCmd.Args()
+		if len(args) < 3 {
+			fmt.Fprintf(createRecCmd.Output(), "Usage: %s record DOMID create [-ttl TTL] [-comment COMMENT] NAME TYPE DATA\n", os.Args[0])
+			createRecCmd.PrintDefaults()
+			os.Exit(2)
+		}
+
+		domID, err := strconv.ParseUint(os.Args[2], 10, 64)
+		if err != nil {
+			log.Fatal("invalid domain id: %s", err)
+		}
+
+		opts := records.CreateOpts{
+			Name:    args[0],
+			Type:    args[1],
+			Data:    args[2],
+			TTL:     *createRecTTL,
+			Comment: *createRecComment,
+		}
+
+		record, err := records.Create(service, domID, opts).Extract()
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Printf("%+v\n", record)
+	} else if listRecCmd.Parsed() {
+		domID, err := strconv.ParseUint(os.Args[2], 10, 64)
+		if err != nil {
+			log.Fatal("invalid domain id: %s", err)
+		}
+
+		opts := records.ListOpts{
+			Name: *listRecFilterName,
+			Data: *listRecFilterData,
+			Type: *listRecFilterType,
+		}
+
+		// set the default to A records if one wasn't supplied
+		if *listRecFilterName != "" && *listRecFilterData != "" && *listRecFilterType == "" {
+			opts.Type = "A"
+		}
+
+		pager := records.List(service, domID, opts)
+
+		listErr := pager.EachPage(func(page pagination.Page) (bool, error) {
+			recordList, err := records.ExtractRecords(page)
+
+			if err != nil {
+				return false, err
+			}
+
+			for _, record := range recordList {
+				fmt.Printf("%+v\n", record)
+			}
+			return true, err
+		})
+
+		if listErr != nil {
+			log.Fatal(listErr)
+		}
 	} else if showRecCmd.Parsed() {
-		fmt.Println("record show")
+		args := showRecCmd.Args()
+		if len(args) < 1 {
+			fmt.Fprintf(showRecCmd.Output(), "Usage: %s record DOMID show ID\n", os.Args[0])
+			showRecCmd.PrintDefaults()
+			os.Exit(2)
+		}
+
+		domID, err := strconv.ParseUint(os.Args[2], 10, 64)
+		if err != nil {
+			log.Fatal("invalid domain id: %s", err)
+		}
+
+		record, err := records.Get(service, domID, args[0]).Extract()
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Printf("%+v\n", record)
 	} else if updateRecCmd.Parsed() {
-		fmt.Println("record update")
+		args := updateRecCmd.Args()
+		if len(args) < 1 {
+			fmt.Fprintf(updateRecCmd.Output(), "Usage: %s record DOMID update [-data DATA] [-ttl TTL] [-priority PRIORITY] ID\n", os.Args[0])
+			updateRecCmd.PrintDefaults()
+			os.Exit(2)
+		}
+
+		domID, err := strconv.ParseUint(os.Args[2], 10, 64)
+		if err != nil {
+			log.Fatal("invalid domain id: %s", err)
+		}
+
+		record, err := records.Get(service, domID, args[0]).Extract()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		opts := records.UpdateOpts{
+			Name:     record.Name,
+			Data:     *updateRecData,
+			Priority: *updateRecPriority,
+			TTL:      *updateRecTTL,
+			Comment:  *updateRecComment,
+		}
+
+		err = records.Update(service, domID, record, opts).ExtractErr()
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println("record updated")
 	} else if deleteRecCmd.Parsed() {
-		fmt.Println("record delete")
+		args := deleteRecCmd.Args()
+		if len(args) < 1 {
+			fmt.Fprintf(deleteRecCmd.Output(), "Usage: %s record DOMID delete ID\n", os.Args[0])
+			deleteRecCmd.PrintDefaults()
+			os.Exit(2)
+		}
+
+		domID, err := strconv.ParseUint(os.Args[2], 10, 64)
+		if err != nil {
+			log.Fatal("invalid domain id: %s", err)
+		}
+
+		deleteErr := records.Delete(service, domID, args[0]).ExtractErr()
+		if deleteErr != nil {
+			log.Fatal(deleteErr)
+		}
+		log.Print("Successfully deleted")
 	} else {
 		flag.PrintDefaults()
 		os.Exit(1)
