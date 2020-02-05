@@ -51,46 +51,28 @@ func main() {
 	switch os.Args[1] {
 	case "domain":
 		if len(os.Args) < 3 {
-			log.Fatal("create, show, update, or delete action is required")
+			log.Fatal("create, list, show, update, or delete action is required")
 		}
 
 		switch os.Args[2] {
 		case "create":
 			createDomCmd.Parse(os.Args[3:])
-			if len(os.Args) < 5 {
-				fmt.Println(os.Args[0], "domain create [domain] [email]")
-				fmt.Println("")
-				createDomCmd.PrintDefaults()
-				os.Exit(2)
-			}
 		case "list":
 			listDomCmd.Parse(os.Args[3:])
 		case "show":
 			showDomCmd.Parse(os.Args[3:])
-			if len(os.Args) < 4 {
-				fmt.Println(os.Args[0], "domain show [ID]")
-				os.Exit(2)
-			}
 		case "update":
 			updateDomCmd.Parse(os.Args[3:])
-			if len(os.Args) < 4 {
-				fmt.Println(os.Args[0], "domain show [ID]")
-				os.Exit(2)
-			}
 		case "delete":
 			deleteDomCmd.Parse(os.Args[3:])
-			if len(os.Args) < 4 {
-				fmt.Println(os.Args[0], "domain show [ID]")
-				os.Exit(2)
-			}
 		default:
-			flag.PrintDefaults()
-			os.Exit(1)
+			log.Fatalf("Usage: %s domain create|list|show|update|delete ...", os.Args[0])
 		}
 	case "record":
 		if len(os.Args) < 4 {
 			log.Fatal("domID and one of create, show, update, or delete action is required")
 		}
+
 		switch os.Args[3] {
 		case "create":
 			createRecCmd.Parse(os.Args[4:])
@@ -124,9 +106,16 @@ func main() {
 	}
 
 	if createDomCmd.Parsed() {
+		args := createDomCmd.Args()
+		if len(args) < 1 {
+			fmt.Fprintf(createDomCmd.Output(), "Usage: %s domain create [-ttl TTL] [-comment COMMENT] DOMAIN EMAIL\n", os.Args[0])
+			createDomCmd.PrintDefaults()
+			os.Exit(2)
+		}
+
 		opts := domains.CreateOpts{
-			Name:    os.Args[3],
-			Email:   os.Args[4],
+			Name:    args[0],
+			Email:   args[1],
 			TTL:     *createDomTTL,
 			Comment: *createDomComment,
 		}
@@ -138,10 +127,8 @@ func main() {
 		fmt.Printf("%+v\n", domain)
 
 	} else if listDomCmd.Parsed() {
-		opts := domains.ListOpts{}
-
-		if *listDomFilter != "" {
-			opts.Name = *listDomFilter
+		opts := domains.ListOpts{
+			Name: *listDomFilter,
 		}
 
 		pager := domains.List(service, opts)
@@ -163,7 +150,14 @@ func main() {
 			log.Fatal(listErr)
 		}
 	} else if showDomCmd.Parsed() {
-		domID, err := strconv.ParseUint(os.Args[3], 10, 64)
+		args := showDomCmd.Args()
+		if len(args) < 1 {
+			fmt.Fprintf(showDomCmd.Output(), "Usage: %s domain show ID\n", os.Args[0])
+			showDomCmd.PrintDefaults()
+			os.Exit(2)
+		}
+
+		domID, err := strconv.ParseUint(args[0], 10, 64)
 		if err != nil {
 			log.Fatal("invalid domain id: %s", err)
 		}
@@ -175,7 +169,14 @@ func main() {
 		fmt.Printf("%+v\n", domain)
 
 	} else if updateDomCmd.Parsed() {
-		domID, err := strconv.ParseUint(os.Args[3], 10, 64)
+		args := updateDomCmd.Args()
+		if len(args) < 1 {
+			fmt.Fprintf(updateDomCmd.Output(), "Usage: %s domain update [-email EMAIL] [-ttl TTL] [-comment COMMENT] ID\n", os.Args[0])
+			updateDomCmd.PrintDefaults()
+			os.Exit(2)
+		}
+
+		domID, err := strconv.ParseUint(args[0], 10, 64)
 		if err != nil {
 			log.Fatal("invalid domain id: %s", err)
 		}
@@ -198,7 +199,14 @@ func main() {
 		fmt.Println("domain updated")
 
 	} else if deleteDomCmd.Parsed() {
-		domID, err := strconv.ParseUint(os.Args[3], 10, 64)
+		args := deleteDomCmd.Args()
+		if len(args) < 1 {
+			fmt.Fprintf(deleteDomCmd.Output(), "Usage: %s domain delete ID\n", os.Args[0])
+			deleteDomCmd.PrintDefaults()
+			os.Exit(2)
+		}
+
+		domID, err := strconv.ParseUint(args[0], 10, 64)
 		if err != nil {
 			log.Fatal("invalid domain id: %s", err)
 		}
