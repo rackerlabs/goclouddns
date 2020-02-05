@@ -107,12 +107,13 @@ func ExtractRecords(r pagination.Page) ([]RecordList, error) {
 
 // RecordShow represents a record returned by the CloudDNS API.
 type RecordShow struct {
-	ID      string `json:"id"`
-	Name    string `json:"name"`
-	Type    string `json:"type"`
-	Data    string `json:"data"`
-	TTL     uint   `json:"ttl"`
-	Comment string `json:"comment"`
-	Updated string `json:"updated"`
-	Created string `json:"created"`
+	ID       string `json:"id"`
+	Name     string `json:"name"`
+	Type     string `json:"type"`
+	Data     string `json:"data"`
+	TTL      uint   `json:"ttl"`
+	Priority uint   `json:"ttl"`
+	Comment  string `json:"comment"`
+	Updated  string `json:"updated"`
+	Created  string `json:"created"`
 }
