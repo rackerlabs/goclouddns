@@ -112,7 +112,7 @@ type RecordShow struct {
 	Type     string `json:"type"`
 	Data     string `json:"data"`
 	TTL      uint   `json:"ttl"`
-	Priority uint   `json:"ttl"`
+	Priority uint   `json:"priority"`
 	Comment  string `json:"comment"`
 	Updated  string `json:"updated"`
 	Created  string `json:"created"`
