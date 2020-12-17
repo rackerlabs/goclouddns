@@ -18,6 +18,9 @@ func (r CreateResult) Extract() (*RecordList, error) {
 		} `json:"response"`
 	}
 	err := r.ExtractInto(&s)
+	if err != nil {
+		return nil, err
+	}
 	return s.Response.Records[0], err
 }
 

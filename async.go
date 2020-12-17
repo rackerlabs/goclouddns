@@ -58,7 +58,13 @@ func WaitForStatus(client *gophercloud.ServiceClient, ret *AsyncResult, status s
 		if latest.Status == "ERROR" {
 			errResp := latest.Error
 			if errResp != nil {
-				return false, fmt.Errorf(errResp["message"].(string))
+				if errResp["message"] != nil {
+					return false, fmt.Errorf(errResp["message"].(string))
+				} else if errResp["details"] != nil {
+					return false, fmt.Errorf(errResp["details"].(string))
+				} else {
+					return false, fmt.Errorf("Unknown error has occurred.")
+				}
 			}
 		}
 
