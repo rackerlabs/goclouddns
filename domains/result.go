@@ -1,46 +1,9 @@
 package domains
 
 import (
-	"encoding/json"
-	"strconv"
-
 	"github.com/gophercloud/gophercloud"
 	"github.com/gophercloud/gophercloud/pagination"
 )
-
-// DNS team changed the API from int64 to string for
-// the accountId and ID fields
-type StringInt int64
-
-func (st *StringInt) UnmarshalJSON(b []byte) error {
-	//convert the bytes into an interface
-	//this will help us check the type of our value
-	//if it is a string that can be converted into an int we convert it
-	///otherwise we return an error
-	var item interface{}
-	if err := json.Unmarshal(b, &item); err != nil {
-		return err
-	}
-	switch v := item.(type) {
-	case int64:
-		*st = StringInt(v)
-	case int:
-		*st = StringInt(int64(v))
-	case string:
-		///here convert the string into
-		///an integer
-		i, err := strconv.Atoi(v)
-		if err != nil {
-			///the string might not be of integer type
-			///so return an error
-			return err
-
-		}
-		*st = StringInt(int64(i))
-
-	}
-	return nil
-}
 
 // CreateResult is the result of a Create operation
 type CreateResult struct {
@@ -86,7 +49,7 @@ func (r GetResult) Extract() (*DomainShow, error) {
 // DomainList represents a domain returned by the CloudDNS API.
 type DomainList struct {
 	// ID is the unique ID of a domain.
-	ID StringInt
+	ID string
 
 	// Created is the date when the domain was created.
 	Created string
@@ -98,7 +61,7 @@ type DomainList struct {
 	Email string `json:"emailAddress"`
 
 	// AccountID is the Tenant ID this domain is under
-	AccountID StringInt `json:"accountId"`
+	AccountID string `json:"accountId"`
 
 	// name is the domain name
 	Name string
@@ -157,11 +120,11 @@ type DomainShow struct {
 	Nameservers []struct {
 		Name string `json:"name"`
 	} `json:"nameservers"`
-	AccountID    StringInt `json:"accountId"`
-	ID           StringInt `json:"id"`
-	Name         string    `json:"name"`
-	EmailAddress string    `json:"emailAddress"`
-	Updated      string    `json:"updated"`
-	Created      string    `json:"created"`
-	Comment      string    `json:"comment"`
+	AccountID    string `json:"accountId"`
+	ID           string `json:"id"`
+	Name         string `json:"name"`
+	EmailAddress string `json:"emailAddress"`
+	Updated      string `json:"updated"`
+	Created      string `json:"created"`
+	Comment      string `json:"comment"`
 }
