@@ -97,6 +97,8 @@ func main() {
 		default:
 			log.Fatalf("Usage: %s record DOMID create|list|show|update|delete ...", os.Args[0])
 		}
+	default:
+		log.Fatalf("Usage: %s domain|record ...", os.Args[0])
 	}
 
 	opts, err := openstack.AuthOptionsFromEnv()
