@@ -18,6 +18,9 @@ func (r CreateResult) Extract() (*DomainList, error) {
 		} `json:"response"`
 	}
 	err := r.ExtractInto(&s)
+	if err != nil {
+		return nil, err
+	}
 	return s.Response.Domains[0], err
 }
 
