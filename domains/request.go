@@ -2,7 +2,6 @@ package domains
 
 import (
 	"log"
-	"strconv"
 
 	"github.com/gophercloud/gophercloud"
 	"github.com/gophercloud/gophercloud/pagination"
@@ -46,16 +45,16 @@ func List(client *gophercloud.ServiceClient, opts ListOptsBuilder) pagination.Pa
 }
 
 // Get returns data about a specific domain by its ID.
-func Get(client *gophercloud.ServiceClient, id uint64) (r GetResult) {
-	url := client.ServiceURL("domains", strconv.FormatUint(id, 10))
+func Get(client *gophercloud.ServiceClient, id string) (r GetResult) {
+	url := client.ServiceURL("domains", id)
 	log.Printf("GET %s", url)
 	_, r.Err = client.Get(url, &r.Body, nil)
 	return
 }
 
 // Delete deletes the specified domain ID.
-func Delete(client *gophercloud.ServiceClient, id uint64) (r DeleteResult) {
-	url := client.ServiceURL("domains", strconv.FormatUint(id, 10))
+func Delete(client *gophercloud.ServiceClient, id string) (r DeleteResult) {
+	url := client.ServiceURL("domains", id)
 	log.Printf("DELETE %s", url)
 
 	var resp goclouddns.AsyncResult
@@ -125,7 +124,7 @@ type UpdateOpts struct {
 
 // Update updates a requested domain
 func Update(client *gophercloud.ServiceClient, domain *DomainShow, opts UpdateOpts) (r UpdateResult) {
-	url := client.ServiceURL("domains", strconv.FormatUint(uint64(domain.ID), 10))
+	url := client.ServiceURL("domains", domain.ID)
 
 	log.Printf("PUT %s", url)
 

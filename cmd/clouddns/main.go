@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strconv"
 
 	"github.com/gophercloud/gophercloud"
 	"github.com/gophercloud/gophercloud/openstack"
@@ -97,6 +96,8 @@ func main() {
 		default:
 			log.Fatalf("Usage: %s record DOMID create|list|show|update|delete ...", os.Args[0])
 		}
+	default:
+		log.Fatalf("Usage: %s domain|record ...", os.Args[0])
 	}
 
 	opts, err := openstack.AuthOptionsFromEnv()
@@ -166,10 +167,7 @@ func main() {
 			os.Exit(2)
 		}
 
-		domID, err := strconv.ParseUint(args[0], 10, 64)
-		if err != nil {
-			log.Fatal("invalid domain id: %s", err)
-		}
+		domID := args[0]
 
 		domain, err := domains.Get(service, domID).Extract()
 		if err != nil {
@@ -185,10 +183,7 @@ func main() {
 			os.Exit(2)
 		}
 
-		domID, err := strconv.ParseUint(args[0], 10, 64)
-		if err != nil {
-			log.Fatal("invalid domain id: %s", err)
-		}
+		domID := args[0]
 
 		domain, err := domains.Get(service, domID).Extract()
 		if err != nil {
@@ -215,10 +210,7 @@ func main() {
 			os.Exit(2)
 		}
 
-		domID, err := strconv.ParseUint(args[0], 10, 64)
-		if err != nil {
-			log.Fatal("invalid domain id: %s", err)
-		}
+		domID := args[0]
 
 		deleteErr := domains.Delete(service, domID).ExtractErr()
 		if deleteErr != nil {
@@ -233,10 +225,7 @@ func main() {
 			os.Exit(2)
 		}
 
-		domID, err := strconv.ParseUint(os.Args[2], 10, 64)
-		if err != nil {
-			log.Fatal("invalid domain id: %s", err)
-		}
+		domID := os.Args[2]
 
 		opts := records.CreateOpts{
 			Name:    args[0],
@@ -252,10 +241,7 @@ func main() {
 		}
 		fmt.Printf("%+v\n", record)
 	} else if listRecCmd.Parsed() {
-		domID, err := strconv.ParseUint(os.Args[2], 10, 64)
-		if err != nil {
-			log.Fatal("invalid domain id: %s", err)
-		}
+		domID := os.Args[2]
 
 		opts := records.ListOpts{
 			Name: *listRecFilterName,
@@ -294,10 +280,7 @@ func main() {
 			os.Exit(2)
 		}
 
-		domID, err := strconv.ParseUint(os.Args[2], 10, 64)
-		if err != nil {
-			log.Fatal("invalid domain id: %s", err)
-		}
+		domID := os.Args[2]
 
 		record, err := records.Get(service, domID, args[0]).Extract()
 		if err != nil {
@@ -312,10 +295,7 @@ func main() {
 			os.Exit(2)
 		}
 
-		domID, err := strconv.ParseUint(os.Args[2], 10, 64)
-		if err != nil {
-			log.Fatal("invalid domain id: %s", err)
-		}
+		domID := os.Args[2]
 
 		record, err := records.Get(service, domID, args[0]).Extract()
 		if err != nil {
@@ -343,10 +323,7 @@ func main() {
 			os.Exit(2)
 		}
 
-		domID, err := strconv.ParseUint(os.Args[2], 10, 64)
-		if err != nil {
-			log.Fatal("invalid domain id: %s", err)
-		}
+		domID := os.Args[2]
 
 		deleteErr := records.Delete(service, domID, args[0]).ExtractErr()
 		if deleteErr != nil {

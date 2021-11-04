@@ -2,7 +2,6 @@ package records
 
 import (
 	"log"
-	"strconv"
 
 	"github.com/gophercloud/gophercloud"
 	"github.com/gophercloud/gophercloud/pagination"
@@ -30,8 +29,8 @@ func (opts ListOpts) ToRecordListQuery() (string, error) {
 	return q.String(), err
 }
 
-func List(client *gophercloud.ServiceClient, domID uint64, opts ListOptsBuilder) pagination.Pager {
-	url := client.ServiceURL("domains", strconv.FormatUint(domID, 10), "records")
+func List(client *gophercloud.ServiceClient, domID string, opts ListOptsBuilder) pagination.Pager {
+	url := client.ServiceURL("domains", domID, "records")
 	if opts != nil {
 		query, err := opts.ToRecordListQuery()
 		if err != nil {
@@ -48,16 +47,16 @@ func List(client *gophercloud.ServiceClient, domID uint64, opts ListOptsBuilder)
 }
 
 // Get returns data about a specific record by its ID.
-func Get(client *gophercloud.ServiceClient, domID uint64, id string) (r GetResult) {
-	url := client.ServiceURL("domains", strconv.FormatUint(domID, 10), "records", id)
+func Get(client *gophercloud.ServiceClient, domID string, id string) (r GetResult) {
+	url := client.ServiceURL("domains", domID, "records", id)
 	log.Printf("GET %s", url)
 	_, r.Err = client.Get(url, &r.Body, nil)
 	return
 }
 
 // Delete deletes the specified record ID.
-func Delete(client *gophercloud.ServiceClient, domID uint64, id string) (r DeleteResult) {
-	url := client.ServiceURL("domains", strconv.FormatUint(domID, 10), "records", id)
+func Delete(client *gophercloud.ServiceClient, domID string, id string) (r DeleteResult) {
+	url := client.ServiceURL("domains", domID, "records", id)
 	log.Printf("DELETE %s", url)
 
 	var resp goclouddns.AsyncResult
@@ -90,8 +89,8 @@ type CreateOpts struct {
 }
 
 // Create creates a requested record
-func Create(client *gophercloud.ServiceClient, domID uint64, opts CreateOpts) (r CreateResult) {
-	url := client.ServiceURL("domains", strconv.FormatUint(domID, 10), "records")
+func Create(client *gophercloud.ServiceClient, domID string, opts CreateOpts) (r CreateResult) {
+	url := client.ServiceURL("domains", domID, "records")
 
 	log.Printf("POST %s", url)
 
@@ -126,8 +125,8 @@ type UpdateOpts struct {
 }
 
 // Update updates a requested record
-func Update(client *gophercloud.ServiceClient, domID uint64, record *RecordShow, opts UpdateOpts) (r UpdateResult) {
-	url := client.ServiceURL("domains", strconv.FormatUint(domID, 10), "records", record.ID)
+func Update(client *gophercloud.ServiceClient, domID string, record *RecordShow, opts UpdateOpts) (r UpdateResult) {
+	url := client.ServiceURL("domains", domID, "records", record.ID)
 
 	log.Printf("PUT %s", url)
 
