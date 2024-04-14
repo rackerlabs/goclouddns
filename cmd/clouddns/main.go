@@ -65,15 +65,30 @@ func main() {
 
 		switch os.Args[2] {
 		case "create":
-			createDomCmd.Parse(os.Args[3:])
+			err := createDomCmd.Parse(os.Args[3:])
+			if err != nil {
+				log.Fatal(err)
+			}
 		case "list":
-			listDomCmd.Parse(os.Args[3:])
+			err := listDomCmd.Parse(os.Args[3:])
+			if err != nil {
+				log.Fatal(err)
+			}
 		case "show":
-			showDomCmd.Parse(os.Args[3:])
+			err := showDomCmd.Parse(os.Args[3:])
+			if err != nil {
+				log.Fatal(err)
+			}
 		case "update":
-			updateDomCmd.Parse(os.Args[3:])
+			err := updateDomCmd.Parse(os.Args[3:])
+			if err != nil {
+				log.Fatal(err)
+			}
 		case "delete":
-			deleteDomCmd.Parse(os.Args[3:])
+			err := deleteDomCmd.Parse(os.Args[3:])
+			if err != nil {
+				log.Fatal(err)
+			}
 		default:
 			log.Fatalf("Usage: %s domain create|list|show|update|delete ...", os.Args[0])
 		}
@@ -84,15 +99,30 @@ func main() {
 
 		switch os.Args[3] {
 		case "create":
-			createRecCmd.Parse(os.Args[4:])
+			err := createRecCmd.Parse(os.Args[4:])
+			if err != nil {
+				log.Fatal(err)
+			}
 		case "list":
-			listRecCmd.Parse(os.Args[4:])
+			err := listRecCmd.Parse(os.Args[4:])
+			if err != nil {
+				log.Fatal(err)
+			}
 		case "show":
-			showRecCmd.Parse(os.Args[4:])
+			err := showRecCmd.Parse(os.Args[4:])
+			if err != nil {
+				log.Fatal(err)
+			}
 		case "update":
-			updateRecCmd.Parse(os.Args[4:])
+			err := updateRecCmd.Parse(os.Args[4:])
+			if err != nil {
+				log.Fatal(err)
+			}
 		case "delete":
-			deleteRecCmd.Parse(os.Args[4:])
+			err := deleteRecCmd.Parse(os.Args[4:])
+			if err != nil {
+				log.Fatal(err)
+			}
 		default:
 			log.Fatalf("Usage: %s record DOMID create|list|show|update|delete ...", os.Args[0])
 		}
