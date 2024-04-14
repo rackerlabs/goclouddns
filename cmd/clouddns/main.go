@@ -7,12 +7,12 @@ import (
 	"os"
 
 	"github.com/gophercloud/gophercloud"
-	"github.com/gophercloud/gophercloud/openstack"
 	"github.com/gophercloud/gophercloud/pagination"
 
 	"github.com/rackerlabs/goclouddns"
 	"github.com/rackerlabs/goclouddns/domains"
 	"github.com/rackerlabs/goclouddns/records"
+	"github.com/rackerlabs/goraxauth"
 )
 
 func main() {
@@ -100,12 +100,12 @@ func main() {
 		log.Fatalf("Usage: %s domain|record ...", os.Args[0])
 	}
 
-	opts, err := openstack.AuthOptionsFromEnv()
+	opts, err := goraxauth.AuthOptionsFromEnv()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	provider, err := openstack.AuthenticatedClient(opts)
+	provider, err := goraxauth.AuthenticatedClient(opts)
 	if err != nil {
 		log.Fatal(err)
 	}
