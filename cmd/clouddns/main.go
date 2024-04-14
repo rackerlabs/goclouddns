@@ -10,9 +10,9 @@ import (
 	"github.com/gophercloud/gophercloud/openstack"
 	"github.com/gophercloud/gophercloud/pagination"
 
-	"github.rackspace.com/doug1840/goclouddns"
-	"github.rackspace.com/doug1840/goclouddns/domains"
-	"github.rackspace.com/doug1840/goclouddns/records"
+	"github.com/rackerlabs/goclouddns"
+	"github.com/rackerlabs/goclouddns/domains"
+	"github.com/rackerlabs/goclouddns/records"
 )
 
 func main() {

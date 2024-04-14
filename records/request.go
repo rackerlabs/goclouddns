@@ -6,7 +6,7 @@ import (
 	"github.com/gophercloud/gophercloud"
 	"github.com/gophercloud/gophercloud/pagination"
 
-	"github.rackspace.com/doug1840/goclouddns"
+	"github.com/rackerlabs/goclouddns"
 )
 
 // ListOptsBuilder allows extensions to add additional parameters to the

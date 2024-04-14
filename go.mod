@@ -1,10 +1,5 @@
-module github.rackspace.com/doug1840/goclouddns
+module github.com/rackerlabs/goclouddns
 
-go 1.13
+go 1.21.6
 
-require (
-	github.com/gophercloud/gophercloud v0.7.0
-	github.com/mitchellh/mapstructure v1.1.2 // indirect
-	github.com/racker/perigee v0.1.0 // indirect
-	github.com/rackspace/gophercloud v1.0.0 // indirect
-)
+require github.com/gophercloud/gophercloud v1.11.0

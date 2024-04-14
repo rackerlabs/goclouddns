@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/gophercloud/gophercloud"
-	"github.com/gophercloud/gophercloud/acceptance/tools"
 )
 
 // AsyncResult is the result of any async operation
@@ -38,7 +37,7 @@ func WaitForStatus(client *gophercloud.ServiceClient, ret *AsyncResult, status s
 
 	url := req.CallbackURL + "?showDetails=true"
 
-	return tools.WaitFor(func() (bool, error) {
+	return gophercloud.WaitFor(60, func() (bool, error) {
 		var resp gophercloud.Result
 		if _, err := client.Get(url, &resp.Body, nil); err != nil {
 			return false, err
