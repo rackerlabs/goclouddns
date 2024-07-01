@@ -18,6 +18,8 @@ import (
 )
 
 func main() {
+	// add top-level options
+	timeoutVal := flag.Uint("timeout", 60, "Operation timeout")
 	// create subcommand of domain
 	createDomCmd := flag.NewFlagSet("create", flag.ExitOnError)
 	createDomComment := createDomCmd.String("comment", "", "optional comments")
@@ -129,10 +131,10 @@ func main() {
 			log.Fatalf("Usage: %s record DOMID create|list|show|update|delete ...", os.Args[0])
 		}
 	default:
-		log.Fatalf("Usage: %s domain|record ...", os.Args[0])
+		log.Fatalf("Usage: %s [-timeout SECONDS] domain|record ...", os.Args[0])
 	}
 
-	timeout := 60 * time.Second
+	timeout := time.Duration(*timeoutVal) * time.Second
 	ctx, cancel := context.WithTimeout(context.TODO(), timeout)
 	defer cancel()
 
