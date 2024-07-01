@@ -1,13 +1,15 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"log"
 	"os"
+	"time"
 
-	"github.com/gophercloud/gophercloud"
-	"github.com/gophercloud/gophercloud/pagination"
+	"github.com/gophercloud/gophercloud/v2"
+	"github.com/gophercloud/gophercloud/v2/pagination"
 
 	"github.com/rackerlabs/goclouddns"
 	"github.com/rackerlabs/goclouddns/domains"
@@ -130,12 +132,16 @@ func main() {
 		log.Fatalf("Usage: %s domain|record ...", os.Args[0])
 	}
 
+	timeout := 60 * time.Second
+	ctx, cancel := context.WithTimeout(context.TODO(), timeout)
+	defer cancel()
+
 	opts, err := goraxauth.AuthOptionsFromEnv()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	provider, err := goraxauth.AuthenticatedClient(opts)
+	provider, err := goraxauth.AuthenticatedClient(ctx, opts)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -160,7 +166,7 @@ func main() {
 			Comment: *createDomComment,
 		}
 
-		domain, err := domains.Create(service, opts).Extract()
+		domain, err := domains.Create(ctx, service, opts).Extract()
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -171,9 +177,9 @@ func main() {
 			Name: *listDomFilter,
 		}
 
-		pager := domains.List(service, opts)
+		pager := domains.List(ctx, service, opts)
 
-		listErr := pager.EachPage(func(page pagination.Page) (bool, error) {
+		listErr := pager.EachPage(ctx, func(ctx context.Context, page pagination.Page) (bool, error) {
 			domainList, err := domains.ExtractDomains(page)
 
 			if err != nil {
@@ -199,7 +205,7 @@ func main() {
 
 		domID := args[0]
 
-		domain, err := domains.Get(service, domID).Extract()
+		domain, err := domains.Get(ctx, service, domID).Extract()
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -215,7 +221,7 @@ func main() {
 
 		domID := args[0]
 
-		domain, err := domains.Get(service, domID).Extract()
+		domain, err := domains.Get(ctx, service, domID).Extract()
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -226,7 +232,7 @@ func main() {
 			Comment: *updateDomComment,
 		}
 
-		err = domains.Update(service, domain, opts).ExtractErr()
+		err = domains.Update(ctx, service, domain, opts).ExtractErr()
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -242,7 +248,7 @@ func main() {
 
 		domID := args[0]
 
-		deleteErr := domains.Delete(service, domID).ExtractErr()
+		deleteErr := domains.Delete(ctx, service, domID).ExtractErr()
 		if deleteErr != nil {
 			log.Fatal(deleteErr)
 		}
@@ -265,7 +271,7 @@ func main() {
 			Comment: *createRecComment,
 		}
 
-		record, err := records.Create(service, domID, opts).Extract()
+		record, err := records.Create(ctx, service, domID, opts).Extract()
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -284,9 +290,9 @@ func main() {
 			opts.Type = "A"
 		}
 
-		pager := records.List(service, domID, opts)
+		pager := records.List(ctx, service, domID, opts)
 
-		listErr := pager.EachPage(func(page pagination.Page) (bool, error) {
+		listErr := pager.EachPage(ctx, func(ctx context.Context, page pagination.Page) (bool, error) {
 			recordList, err := records.ExtractRecords(page)
 
 			if err != nil {
@@ -312,7 +318,7 @@ func main() {
 
 		domID := os.Args[2]
 
-		record, err := records.Get(service, domID, args[0]).Extract()
+		record, err := records.Get(ctx, service, domID, args[0]).Extract()
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -327,7 +333,7 @@ func main() {
 
 		domID := os.Args[2]
 
-		record, err := records.Get(service, domID, args[0]).Extract()
+		record, err := records.Get(ctx, service, domID, args[0]).Extract()
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -340,7 +346,7 @@ func main() {
 			Comment:  *updateRecComment,
 		}
 
-		err = records.Update(service, domID, record, opts).ExtractErr()
+		err = records.Update(ctx, service, domID, record, opts).ExtractErr()
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -355,7 +361,7 @@ func main() {
 
 		domID := os.Args[2]
 
-		deleteErr := records.Delete(service, domID, args[0]).ExtractErr()
+		deleteErr := records.Delete(ctx, service, domID, args[0]).ExtractErr()
 		if deleteErr != nil {
 			log.Fatal(deleteErr)
 		}

@@ -1,9 +1,10 @@
 package goclouddns
 
 import (
+	"context"
 	"fmt"
 
-	"github.com/gophercloud/gophercloud"
+	"github.com/gophercloud/gophercloud/v2"
 )
 
 // AsyncResult is the result of any async operation
@@ -29,7 +30,7 @@ func (r AsyncResult) Extract() (*AsyncMessage, error) {
 	return &s, err
 }
 
-func WaitForStatus(client *gophercloud.ServiceClient, ret *AsyncResult, status string) error {
+func WaitForStatus(ctx context.Context, client *gophercloud.ServiceClient, ret *AsyncResult, status string) error {
 	req, err := ret.Extract()
 	if err != nil {
 		return err
@@ -37,9 +38,9 @@ func WaitForStatus(client *gophercloud.ServiceClient, ret *AsyncResult, status s
 
 	url := req.CallbackURL + "?showDetails=true"
 
-	return gophercloud.WaitFor(60, func() (bool, error) {
+	return gophercloud.WaitFor(ctx, func(ctx context.Context) (bool, error) {
 		var resp gophercloud.Result
-		if _, err := client.Get(url, &resp.Body, nil); err != nil {
+		if _, err := client.Get(ctx, url, &resp.Body, nil); err != nil {
 			return false, err
 		}
 

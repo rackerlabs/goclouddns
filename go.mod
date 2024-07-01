@@ -1,10 +1,10 @@
 module github.com/rackerlabs/goclouddns
 
-go 1.21.6
+go 1.22
+
+toolchain go1.22.3
 
 require (
-	github.com/gophercloud/gophercloud v1.11.0
-	github.com/rackerlabs/goraxauth v0.0.0-20240414034322-f28547de0fe7
+	github.com/gophercloud/gophercloud/v2 v2.0.0
+	github.com/rackerlabs/goraxauth v0.0.0-20240701164106-35b425b9a401
 )
-
-replace github.com/gophercloud/gophercloud => github.com/cardoe/gophercloud v1.5.1-0.20240414024906-92421bde3201

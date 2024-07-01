@@ -1,10 +1,11 @@
 package domains
 
 import (
+	"context"
 	"log"
 
-	"github.com/gophercloud/gophercloud"
-	"github.com/gophercloud/gophercloud/pagination"
+	"github.com/gophercloud/gophercloud/v2"
+	"github.com/gophercloud/gophercloud/v2/pagination"
 
 	"github.com/rackerlabs/goclouddns"
 )
@@ -27,7 +28,7 @@ func (opts ListOpts) ToDomainListQuery() (string, error) {
 	return q.String(), err
 }
 
-func List(client *gophercloud.ServiceClient, opts ListOptsBuilder) pagination.Pager {
+func List(_ctx context.Context, client *gophercloud.ServiceClient, opts ListOptsBuilder) pagination.Pager {
 	url := client.ServiceURL("domains")
 	if opts != nil {
 		query, err := opts.ToDomainListQuery()
@@ -45,20 +46,20 @@ func List(client *gophercloud.ServiceClient, opts ListOptsBuilder) pagination.Pa
 }
 
 // Get returns data about a specific domain by its ID.
-func Get(client *gophercloud.ServiceClient, id string) (r GetResult) {
+func Get(ctx context.Context, client *gophercloud.ServiceClient, id string) (r GetResult) {
 	url := client.ServiceURL("domains", id)
 	log.Printf("GET %s", url)
-	_, r.Err = client.Get(url, &r.Body, nil)
+	_, r.Err = client.Get(ctx, url, &r.Body, nil)
 	return
 }
 
 // Delete deletes the specified domain ID.
-func Delete(client *gophercloud.ServiceClient, id string) (r DeleteResult) {
+func Delete(ctx context.Context, client *gophercloud.ServiceClient, id string) (r DeleteResult) {
 	url := client.ServiceURL("domains", id)
 	log.Printf("DELETE %s", url)
 
 	var resp goclouddns.AsyncResult
-	_, resp.Err = client.Delete(url, &gophercloud.RequestOpts{
+	_, resp.Err = client.Delete(ctx, url, &gophercloud.RequestOpts{
 		JSONResponse: &resp.Body,
 	})
 
@@ -67,7 +68,7 @@ func Delete(client *gophercloud.ServiceClient, id string) (r DeleteResult) {
 		return
 	}
 
-	if err := goclouddns.WaitForStatus(client, &resp, "COMPLETED"); err != nil {
+	if err := goclouddns.WaitForStatus(ctx, client, &resp, "COMPLETED"); err != nil {
 		r.Err = err
 		return
 	}
@@ -85,7 +86,7 @@ type CreateOpts struct {
 }
 
 // Create creates a requested domain
-func Create(client *gophercloud.ServiceClient, opts CreateOpts) (r CreateResult) {
+func Create(ctx context.Context, client *gophercloud.ServiceClient, opts CreateOpts) (r CreateResult) {
 	url := client.ServiceURL("domains")
 
 	if opts.TTL == 0 {
@@ -101,13 +102,13 @@ func Create(client *gophercloud.ServiceClient, opts CreateOpts) (r CreateResult)
 	}
 
 	var resp goclouddns.AsyncResult
-	_, resp.Err = client.Post(url, body, &resp.Body, nil)
+	_, resp.Err = client.Post(ctx, url, body, &resp.Body, nil)
 	if resp.Err != nil {
 		r.Err = resp.Err
 		return
 	}
 
-	if err := goclouddns.WaitForStatus(client, &resp, "COMPLETED"); err != nil {
+	if err := goclouddns.WaitForStatus(ctx, client, &resp, "COMPLETED"); err != nil {
 		r.Err = err
 		return
 	}
@@ -123,19 +124,19 @@ type UpdateOpts struct {
 }
 
 // Update updates a requested domain
-func Update(client *gophercloud.ServiceClient, domain *DomainShow, opts UpdateOpts) (r UpdateResult) {
+func Update(ctx context.Context, client *gophercloud.ServiceClient, domain *DomainShow, opts UpdateOpts) (r UpdateResult) {
 	url := client.ServiceURL("domains", domain.ID)
 
 	log.Printf("PUT %s", url)
 
 	var resp goclouddns.AsyncResult
-	_, resp.Err = client.Put(url, opts, &resp.Body, nil)
+	_, resp.Err = client.Put(ctx, url, opts, &resp.Body, nil)
 	if resp.Err != nil {
 		r.Err = resp.Err
 		return
 	}
 
-	if err := goclouddns.WaitForStatus(client, &resp, "COMPLETED"); err != nil {
+	if err := goclouddns.WaitForStatus(ctx, client, &resp, "COMPLETED"); err != nil {
 		r.Err = err
 		return
 	}
