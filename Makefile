@@ -26,3 +26,12 @@ build: ## Build the binary locally
 .PHONY: release-test
 release-test: ## Test goreleaser configuration without publishing
 	goreleaser release --snapshot --clean
+
+.PHONY: test
+test: ## Run tests
+	go test -race ./...
+
+.PHONY: test-coverage
+test-coverage: ## Run tests with coverage report
+	go test -race -coverprofile=coverage.out -covermode=atomic ./...
+	go tool cover -html=coverage.out -o coverage.html

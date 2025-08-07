@@ -11,7 +11,7 @@ permissions:
   checks: write
 
 jobs:
-  go-mod:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -24,3 +24,11 @@ jobs:
           go mod tidy
           git diff --exit-code go.mod
           git diff --exit-code go.sum
+      - name: Run tests with coverage
+        run: go test -race -coverprofile=coverage.out -covermode=atomic ./...
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage.out
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false
