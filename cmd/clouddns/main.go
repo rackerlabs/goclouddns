@@ -17,6 +17,13 @@ import (
 	"github.com/rackerlabs/goraxauth"
 )
 
+// Build information. Populated at build-time via ldflags.
+var (
+	version = "dev"
+	commit  = "unknown"
+	date    = "unknown"
+)
+
 func main() {
 	// add top-level options
 	timeoutVal := flag.Uint("timeout", 60, "Operation timeout")
@@ -57,7 +64,16 @@ func main() {
 	// delete subcommand of record
 	deleteRecCmd := flag.NewFlagSet("delete", flag.ExitOnError)
 
+	// Handle --version flag
+	if len(os.Args) >= 2 && (os.Args[1] == "--version" || os.Args[1] == "-version") {
+		fmt.Printf("clouddns version %s\n", version)
+		fmt.Printf("commit: %s\n", commit)
+		fmt.Printf("built: %s\n", date)
+		os.Exit(0)
+	}
+
 	if len(os.Args) < 2 {
+		fmt.Printf("clouddns version %s\n\n", version)
 		log.Fatal("domain or record subcommand is required")
 	}
 

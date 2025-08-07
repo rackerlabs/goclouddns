@@ -18,3 +18,11 @@ fmt: ## Ensure consistent code style
 .PHONY: run
 run: ## Run the test binary locally
 	@go run cmd/clouddns/main.go
+
+.PHONY: build
+build: ## Build the binary locally
+	@go build -o bin/clouddns ./cmd/clouddns
+
+.PHONY: release-test
+release-test: ## Test goreleaser configuration without publishing
+	goreleaser release --snapshot --clean
