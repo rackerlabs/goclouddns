@@ -8,10 +8,9 @@ To run the test binary, you'll need a cloud username and password/api-key.
 
 ```bash
 export OS_USERNAME=[username]
-export OS_TENANT_ID=[tenantid]
-# password or API key
-export OS_PASSWORD=[password]
 export RAX_API_KEY=[api-key]
+# or if you can auth by a password
+export OS_PASSWORD=[password]
 go run ./cmd/clouddns domain list
 ```
 
