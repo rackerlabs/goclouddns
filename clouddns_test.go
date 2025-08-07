@@ -1,10 +1,8 @@
 package goclouddns
 
 import (
-	"context"
 	"encoding/json"
 	"testing"
-	"time"
 
 	"github.com/gophercloud/gophercloud/v2"
 )
