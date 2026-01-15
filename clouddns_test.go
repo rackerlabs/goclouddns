@@ -31,8 +31,8 @@ func TestAsyncMessage_JSONMarshaling(t *testing.T) {
 		JobID:       "job-123",
 		Request:     "POST",
 		Status:      "COMPLETED",
-		Response:    map[string]interface{}{"id": "123"},
-		Error:       map[string]interface{}{"code": 400},
+		Response:    map[string]any{"id": "123"},
+		Error:       map[string]any{"code": 400},
 		RequestURL:  "https://example.com/domains",
 		Verb:        "POST",
 	}
