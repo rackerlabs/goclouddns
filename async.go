@@ -13,14 +13,14 @@ type AsyncResult struct {
 }
 
 type AsyncMessage struct {
-	CallbackURL string                 `json:"callbackUrl"`
-	JobID       string                 `json:"jobId"`
-	Request     string                 `json:"request"`
-	Response    map[string]interface{} `json:"response"`
-	Error       map[string]interface{} `json:"error"`
-	RequestURL  string                 `json:"requestUrl"`
-	Verb        string                 `json:"verb"`
-	Status      string                 `json:"status"`
+	CallbackURL string         `json:"callbackUrl"`
+	JobID       string         `json:"jobId"`
+	Request     string         `json:"request"`
+	Response    map[string]any `json:"response"`
+	Error       map[string]any `json:"error"`
+	RequestURL  string         `json:"requestUrl"`
+	Verb        string         `json:"verb"`
+	Status      string         `json:"status"`
 }
 
 // Extract interprets a GetResult as a Domain.
@@ -59,11 +59,11 @@ func WaitForStatus(ctx context.Context, client *gophercloud.ServiceClient, ret *
 			errResp := latest.Error
 			if errResp != nil {
 				if errResp["details"] != nil {
-					return false, fmt.Errorf(errResp["details"].(string))
+					return false, fmt.Errorf("%s", errResp["details"].(string))
 				} else if errResp["message"] != nil {
-					return false, fmt.Errorf(errResp["message"].(string))
+					return false, fmt.Errorf("%s", errResp["message"].(string))
 				} else {
-					return false, fmt.Errorf("Unknown error has occurred.")
+					return false, fmt.Errorf("%s", "Unknown error has occurred.")
 				}
 			}
 		}

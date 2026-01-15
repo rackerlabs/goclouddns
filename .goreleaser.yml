@@ -62,6 +62,17 @@ changelog:
     - title: Others
       order: 999
 
+signs:
+  - cmd: cosign
+    signature: "${artifact}.sigstore.json"
+    output: true
+    artifacts: checksum
+    args:
+      - sign-blob
+      - "--bundle=${signature}"
+      - "${artifact}"
+      - --yes
+
 release:
   draft: false
   prerelease: auto
