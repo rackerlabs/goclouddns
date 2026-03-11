@@ -97,5 +97,5 @@ release:
     ```bash
     clouddns domain list
     clouddns domain create example.com admin@example.com
-    clouddns record DOMAIN_ID list
+    clouddns record list DOMAIN_ID
     ```
